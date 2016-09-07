@@ -5,20 +5,20 @@
     xmlns:local="using:UAReader.UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Loaded="Page_Loaded">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <SplitView Name="mainSplitView" CompactPaneLength="0" OpenPaneLength="100" DisplayMode="CompactOverlay">
             <SplitView.Pane>
                 <ListView Name="mainNavigationList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="mainNavigationList_ItemClick">
-                    <ListViewItem Tag="menu" Name="menuItem" Background="AliceBlue">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE700;"
-                                       Style="{StaticResource MenuIcon}"/>
-                        </StackPanel>
-                    </ListViewItem>
-                    <ListBoxItem>
-                        aaa
-                    </ListBoxItem>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Tag="{Binding Name}" Orientation="Horizontal">
+                                <TextBlock Text="{Binding Icon}"
+                                           Style="{StaticResource MenuIcon}"/>
+                                <TextBlock Text="{Binding Desc}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
                 </ListView>
             </SplitView.Pane>
             <SplitView.Content>
@@ -30,10 +30,9 @@
                     <RelativePanel Height="44" Background="{ThemeResource SystemControlHighlightAltListAccentLowBrush}">
                         <TextBlock Text="&#xE700;" Padding="12 16" Style="{StaticResource MenuIcon}" Tapped="Menu_Tapped"/>
                     </RelativePanel>
+                    <Frame Grid.Row="1" Background="Black"></Frame>
                 </Grid>
             </SplitView.Content>
         </SplitView>
-        <!--<TextBlock Margin="12 16 0 0" Text="&#xE700;" VerticalAlignment="Top"
-                                       Style="{StaticResource MenuIcon}"/>-->
     </Grid>
 </Page>

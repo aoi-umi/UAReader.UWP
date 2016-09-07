@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using UAReader.UWP.Model;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -25,14 +27,14 @@ namespace UAReader.UWP
         public MainPage()
         {
             InitializeComponent();
+            NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
         private void mainNavigationList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var content = e.ClickedItem as FrameworkElement;
-            var item = content.Parent as SelectorItem;
+            var item = e.ClickedItem as MenuModel;
             if (item == null) return;
-            switch (item.Tag.ToString())
+            switch (item.Name)
             {
                 case "menu":
                     MenuToggle();
@@ -48,6 +50,18 @@ namespace UAReader.UWP
         private void MenuToggle()
         {
             mainSplitView.IsPaneOpen = !mainSplitView.IsPaneOpen;
+        }
+
+        private ObservableCollection<MenuModel> menuList;
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            menuList = new ObservableCollection<MenuModel>() {
+                new MenuModel() {
+                    Name = "menu",
+                    Icon = "\ue700"                    
+                }
+            };
+            mainNavigationList.ItemsSource = menuList;
         }
     }
 }
