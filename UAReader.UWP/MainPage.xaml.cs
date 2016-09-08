@@ -6,8 +6,10 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UAReader.UWP.Model;
 using UAReader.UWP.View;
+using UmiAoi.UWP;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -28,20 +30,63 @@ namespace UAReader.UWP
         public MainPage()
         {
             InitializeComponent();
+            currentView = SystemNavigationManager.GetForCurrentView();
+            deviceFamily = Helper.GetDeviceFamily();
             NavigationCacheMode = NavigationCacheMode.Enabled;
+        }
+
+        private DeviceFamily deviceFamily;
+        private SystemNavigationManager currentView;
+        private ObservableCollection<MenuModel> menuList;
+        private ObservableCollection<FileListModel> fileList;
+
+        #region event
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            currentView.BackRequested += Page_BackRequested;
+            mainFrame.Navigated += MainFrame_Navigated;
+            menuList = InitMenuList();
+            fileList = InitFileList();
+            mainNavigationList.ItemsSource = menuList;
+            var result = mainFrame.Navigate(typeof(FileListView), fileList);
+            mainNavigationList.SelectedIndex = 0;
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            currentView.BackRequested -= Page_BackRequested;
+            mainFrame.Navigated -= MainFrame_Navigated;
+        }
+
+        private void Page_BackRequested(object sender, BackRequestedEventArgs e)
+        {
+            if (mainFrame.CanGoBack)
+            {
+                mainFrame.GoBack();
+                e.Handled = true;
+            }
+        }
+
+        private void MainFrame_Navigated(object sender, NavigationEventArgs e)
+        {
+            if (deviceFamily == DeviceFamily.Desktop) {
+                currentView.AppViewBackButtonVisibility = mainFrame.CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
+            }
         }
 
         private void mainNavigationList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var item = e.ClickedItem as MenuModel;
-            if (item == null) return;
-            switch (item.MenuType)
+            var clickItem = e.ClickedItem as MenuModel;            
+            if (clickItem == null) return;
+            var selectedItem = mainNavigationList.SelectedItem as MenuModel;
+            if (selectedItem == null || selectedItem != clickItem)
             {
-                case MenuType.Menu:
-                    break;
-                case MenuType.Test:
-                    var result = mainFrame.Navigate(typeof(FileListView), fileList);
-                    break;
+                switch (clickItem.MenuType)
+                {
+                    case MenuType.FileList:
+                        var result = mainFrame.Navigate(typeof(FileListView), fileList);
+                        break;
+                }
             }
             MenuToggle();
         }
@@ -50,27 +95,37 @@ namespace UAReader.UWP
         {
             MenuToggle();
         }
+        #endregion
 
         public void MenuToggle()
         {
             mainSplitView.IsPaneOpen = !mainSplitView.IsPaneOpen;
         }
 
-        private ObservableCollection<MenuModel> menuList;
-        private ObservableCollection<FileListModel> fileList;
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        #region Init
+        private ObservableCollection<MenuModel> InitMenuList()
         {
-            menuList = new ObservableCollection<MenuModel>() {
+            return new ObservableCollection<MenuModel>() {
+                //new MenuModel() {
+                //    MenuType = MenuType.Menu,
+                //    Icon = "\ue700"
+                //},
                 new MenuModel() {
-                    MenuType = MenuType.Menu,
-                    Icon = "\ue700"
+                    MenuType = MenuType.FileList,
+                    Icon = "\uE1D3",
+                    Desc = "文件列表"
                 },
                 new MenuModel() {
-                    MenuType = MenuType.Test,
-                    Icon = "\ue700"
+                    MenuType = MenuType.Setting,
+                    Icon = "\uE713",
+                    Desc = "设置"
                 },
             };
-            fileList = new ObservableCollection<FileListModel>()
+        }
+
+        private ObservableCollection<FileListModel> InitFileList()
+        {
+            return new ObservableCollection<FileListModel>()
             {
                 new FileListModel() {
                     Img = "ms-appx:///Assets/Square44x44Logo.png",
@@ -81,13 +136,14 @@ namespace UAReader.UWP
                     Title = "title2"
                 },
             };
-            mainNavigationList.ItemsSource = menuList;
         }
+        #endregion
     }
 
     public enum MenuType
     {
-        Menu,
-        Test
+        //Menu,
+        FileList,
+        Setting
     }
 }

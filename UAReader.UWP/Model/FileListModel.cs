@@ -10,5 +10,7 @@ namespace UAReader.UWP.Model
     {
         public string Img { get; set; }
         public string Title { get; set; }
+        public double Progress { get; set; }
+        public double Offset { get; set; }
     }
 }

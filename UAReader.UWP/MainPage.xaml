@@ -6,10 +6,23 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
     x:Class="UAReader.UWP.MainPage"
-    mc:Ignorable="d" Loaded="Page_Loaded"
+    mc:Ignorable="d" Loaded="Page_Loaded" Unloaded="Page_Unloaded"
     x:Name="page">
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <SplitView x:Name="mainSplitView" CompactPaneLength="0" OpenPaneLength="100" DisplayMode="CompactOverlay">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <RelativePanel Height="44" Background="{ThemeResource SystemControlHighlightChromeHighBrush}">
+            <TextBlock Text="&#xE700;" Padding="12 16" Style="{StaticResource MenuIcon}">
+                        <Interactivity:Interaction.Behaviors>
+                            <Core:EventTriggerBehavior EventName="Tapped">
+                                <Core:CallMethodAction TargetObject="{Binding ElementName=page}" MethodName="MenuToggle"/>
+                            </Core:EventTriggerBehavior>
+                        </Interactivity:Interaction.Behaviors>
+            </TextBlock>
+        </RelativePanel>
+        <SplitView x:Name="mainSplitView" Grid.Row="1" CompactPaneLength="0" OpenPaneLength="100" DisplayMode="CompactOverlay">
             <SplitView.Pane>
                 <ListView x:Name="mainNavigationList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="mainNavigationList_ItemClick">
                     <!--<Interactivity:Interaction.Behaviors>
@@ -22,30 +35,14 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Icon}"
                                            Style="{StaticResource MenuIcon}"/>
-                                <TextBlock Text="{Binding Desc}"/>
+                                <TextBlock Text="{Binding Desc}"
+                                           Style="{StaticResource MenuText}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
             </SplitView.Pane>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <RelativePanel Height="44" Background="{ThemeResource SystemControlHighlightChromeHighBrush}">
-                    <TextBlock Text="&#xE700;" Padding="12 16" Style="{StaticResource MenuIcon}">
-                        <Interactivity:Interaction.Behaviors>
-                            <Core:EventTriggerBehavior EventName="Tapped">
-                                <Core:CallMethodAction TargetObject="{Binding ElementName=page}" MethodName="MenuToggle"/>
-                            </Core:EventTriggerBehavior>
-                        </Interactivity:Interaction.Behaviors>
-                    </TextBlock>
-                </RelativePanel>
-                <Frame x:Name="mainFrame" Grid.Row="1">
-                    
-                </Frame>
-            </Grid>
+            <Frame x:Name="mainFrame"/>
         </SplitView>
     </Grid>
 </Page>
