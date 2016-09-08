@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UAReader.UWP.Model;
+using UAReader.UWP.View;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -34,12 +35,15 @@ namespace UAReader.UWP
         {
             var item = e.ClickedItem as MenuModel;
             if (item == null) return;
-            switch (item.Name)
+            switch (item.MenuType)
             {
-                case "menu":
-                    MenuToggle();
+                case MenuType.Menu:
+                    break;
+                case MenuType.Test:
+                    var result = mainFrame.Navigate(typeof(FileListView), fileList);
                     break;
             }
+            MenuToggle();
         }
 
         private void Menu_Tapped(object sender, TappedRoutedEventArgs e)
@@ -47,21 +51,43 @@ namespace UAReader.UWP
             MenuToggle();
         }
 
-        private void MenuToggle()
+        public void MenuToggle()
         {
             mainSplitView.IsPaneOpen = !mainSplitView.IsPaneOpen;
         }
 
         private ObservableCollection<MenuModel> menuList;
+        private ObservableCollection<FileListModel> fileList;
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             menuList = new ObservableCollection<MenuModel>() {
                 new MenuModel() {
-                    Name = "menu",
-                    Icon = "\ue700"                    
-                }
+                    MenuType = MenuType.Menu,
+                    Icon = "\ue700"
+                },
+                new MenuModel() {
+                    MenuType = MenuType.Test,
+                    Icon = "\ue700"
+                },
+            };
+            fileList = new ObservableCollection<FileListModel>()
+            {
+                new FileListModel() {
+                    Img = "ms-appx:///Assets/Square44x44Logo.png",
+                    Title = "title1"
+                },
+                new FileListModel() {
+                    Img = "ms-appx:///Assets/Square44x44Logo.png",
+                    Title = "title2"
+                },
             };
             mainNavigationList.ItemsSource = menuList;
         }
+    }
+
+    public enum MenuType
+    {
+        Menu,
+        Test
     }
 }

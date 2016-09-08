@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace UAReader.UWP.Model
 {
-    public class MenuModel
+    public class FileListModel
     {
-        public MenuType MenuType { get; set; }
-        public string Icon { get; set; }
-        public string Desc { get; set; }
+        public string Img { get; set; }
+        public string Title { get; set; }
     }
 }
