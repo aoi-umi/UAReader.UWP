@@ -5,9 +5,14 @@
     xmlns:local="using:UAReader.UWP.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
+    mc:Ignorable="d" x:Name="page">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <ListView Name="mainListView">
             <ListView.ItemTemplate>
                 <DataTemplate>
@@ -24,5 +29,19 @@
                 </RelativePanel>
             </ListViewItem>-->
         </ListView>
+        <RelativePanel 
+            Grid.Row="1" Height="44"
+            Background="{ThemeResource SystemControlHighlightChromeHighBrush}">
+            <Button                 
+                Content="&#xEC50;" Padding="7"
+                RelativePanel.AlignRightWithPanel="True"
+                Style="{StaticResource NavButton}">
+                <Interactivity:Interaction.Behaviors>
+                            <Core:EventTriggerBehavior EventName="Tapped">
+                                <Core:CallMethodAction TargetObject="{Binding ElementName=page}" MethodName="OpenFileDialog"/>
+                            </Core:EventTriggerBehavior>
+                        </Interactivity:Interaction.Behaviors>
+            </Button>
+        </RelativePanel>
     </Grid>
 </Page>

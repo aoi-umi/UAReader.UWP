@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UAReader.UWP.Model;
+using UmiAoi.UWP;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
@@ -21,7 +23,16 @@ namespace UAReader.UWP.View
         {
             var fileList = e.Parameter as ObservableCollection<FileListModel>;
             if (fileList != null) mainListView.ItemsSource = fileList;
+            FileTypeFilter = new List<string>() {
+                ".txt"
+            };
             base.OnNavigatedTo(e);
+        }
+
+        private IList<string> FileTypeFilter;
+        public async void OpenFileDialog()
+        {
+            var list = await Helper.GetFileList(FileTypeFilter);
         }
     }
 }

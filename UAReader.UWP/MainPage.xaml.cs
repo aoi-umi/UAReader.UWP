@@ -79,12 +79,16 @@ namespace UAReader.UWP
             var clickItem = e.ClickedItem as MenuModel;            
             if (clickItem == null) return;
             var selectedItem = mainNavigationList.SelectedItem as MenuModel;
+            bool result = false;
             if (selectedItem == null || selectedItem != clickItem)
             {
                 switch (clickItem.MenuType)
                 {
                     case MenuType.FileList:
-                        var result = mainFrame.Navigate(typeof(FileListView), fileList);
+                        result = mainFrame.Navigate(typeof(FileListView), fileList);
+                        break;
+                    case MenuType.Setting:
+                        result = mainFrame.Navigate(typeof(SettingView));
                         break;
                 }
             }

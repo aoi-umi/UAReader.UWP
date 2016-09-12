@@ -107,6 +107,9 @@
     <Compile Include="View\FileListView.xaml.cs">
       <DependentUpon>FileListView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\SettingView.xaml.cs">
+      <DependentUpon>SettingView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WinRTExceptions\ExceptionHandlingSynchronizationContext.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -135,6 +138,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\FileListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SettingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
