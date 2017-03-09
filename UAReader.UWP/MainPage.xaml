@@ -24,7 +24,8 @@
         </RelativePanel>
         <SplitView x:Name="mainSplitView" Grid.Row="1" CompactPaneLength="0" OpenPaneLength="100" DisplayMode="CompactOverlay">
             <SplitView.Pane>
-                <ListView x:Name="mainNavigationList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="mainNavigationList_ItemClick">
+                <ListView x:Name="mainNavigationList" SelectionMode="Single" IsItemClickEnabled="True" ItemClick="mainNavigationList_ItemClick" 
+                          >
                     <!--<Interactivity:Interaction.Behaviors>
                         <Core:EventTriggerBehavior EventName="SelectionChanged">
                             <Core:NavigateToPageAction/>
@@ -42,7 +43,30 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </SplitView.Pane>
-            <Frame x:Name="mainFrame"/>
+            <Grid>
+                <Frame x:Name="mainFrame" Visibility="Collapsed"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Name="grid" Grid.ColumnSpan="1">
+                        <TextBlock Name="Textbox" TextWrapping="Wrap"/>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <ScrollViewer Name="sv" HorizontalScrollMode="Disabled" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
+                            <TextBlock Name="Textbox1" TextWrapping="Wrap"/>
+                        </ScrollViewer>
+                    </Grid>
+                    <TextBlock Name="PreviewBox" Grid.Column="1" TextWrapping="Wrap" Visibility="Collapsed"/>
+                    <Button Grid.Row="1" Content="pre" Click="Pre_Click"/>
+                    <Button Grid.Row="1" Grid.Column="1" Content="next" Click="Next_Click"/>
+                </Grid>
+            </Grid>
         </SplitView>
     </Grid>
 </Page>

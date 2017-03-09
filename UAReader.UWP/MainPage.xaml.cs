@@ -31,20 +31,36 @@ namespace UAReader.UWP
         {
             InitializeComponent();
             currentView = SystemNavigationManager.GetForCurrentView();
-            deviceFamily = Helper.GetDeviceFamily();
+            deviceFamily = Helper.CurrDeviceFamily;
             NavigationCacheMode = NavigationCacheMode.Enabled;
+            size = Helper.MeasureStringSize(new MeasureFontRequest() { Input = "a", MaxLines = 1, FontSize = Textbox1.FontSize }); ;
         }
-
+        private Size size;
         private DeviceFamily deviceFamily;
         private SystemNavigationManager currentView;
         private ObservableCollection<MenuModel> menuList;
         private ObservableCollection<FileListModel> fileList;
 
-        #region event
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+
+        private void AddEvent()
         {
             currentView.BackRequested += Page_BackRequested;
             mainFrame.Navigated += MainFrame_Navigated;
+            grid.SizeChanged += Textbox_SizeChanged;
+        }
+
+        private void RemoveEvent()
+        {
+            currentView.BackRequested -= Page_BackRequested;
+            mainFrame.Navigated -= MainFrame_Navigated;
+            grid.SizeChanged -= Textbox_SizeChanged;
+        }
+
+        #region event
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            UpdatePadding();
+            AddEvent();
             menuList = InitMenuList();
             fileList = InitFileList();
             mainNavigationList.ItemsSource = menuList;
@@ -54,8 +70,7 @@ namespace UAReader.UWP
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            currentView.BackRequested -= Page_BackRequested;
-            mainFrame.Navigated -= MainFrame_Navigated;
+            RemoveEvent();
         }
 
         private void Page_BackRequested(object sender, BackRequestedEventArgs e)
@@ -89,6 +104,9 @@ namespace UAReader.UWP
                         break;
                     case MenuType.Setting:
                         result = mainFrame.Navigate(typeof(SettingView));
+                        break;
+                    case MenuType.OpenFile:
+                        OpenFile();
                         break;
                 }
             }
@@ -124,6 +142,11 @@ namespace UAReader.UWP
                     Icon = "\uE713",
                     Desc = "设置"
                 },
+                new MenuModel() {
+                    MenuType = MenuType.OpenFile,
+                    Icon = "",
+                    Desc = "打开文件（test）"
+                },
             };
         }
 
@@ -142,12 +165,136 @@ namespace UAReader.UWP
             };
         }
         #endregion
+
+        private void Pre_Click(object sender, RoutedEventArgs e)
+        {
+            if (currIndex > 0)
+            {
+                s = fullS.Substring(0, currIndex);
+                UpdateText(OperateType.Prep);
+            }
+            else
+            {
+                s = fullS;
+                UpdateText(OperateType.None);
+            }
+            //if (preIndexStack.Count > 0)
+            //{
+            //    var last = preIndexStack.Last();
+            //    if (!string.IsNullOrEmpty(fullS) && fullS.Length > last)
+            //    {
+            //        s = fullS.Substring(last);
+            //        preIndexStack.RemoveAt(preIndexStack.Count - 1);
+            //        UpdateText(false);
+            //    } 
+            //}
+            sv.ChangeView(0, sv.VerticalOffset - sv.ActualHeight, sv.ZoomFactor);
+        }
+
+        private void Next_Click(object sender, RoutedEventArgs e)
+        {
+            if (index > 0 && fullS != null && currIndex < fullS.Length)
+            {
+                s = fullS.Substring(currIndex);                
+                UpdateText(OperateType.Next);
+            }
+            sv.ChangeView(0, sv.VerticalOffset + sv.ActualHeight, sv.ZoomFactor);
+        }
+        string s = string.Empty;
+        string fullS = string.Empty;
+        int index = -1;
+        int currIndex = 0;
+        //List<int> preIndexStack = new List<int>();
+        private async void OpenFile()
+        {
+            var list = await Helper.GetFileList(new List<string> { ".txt",".js" });
+            if (list != null && list.Count > 0)
+            {
+                var file = list[0];
+                currIndex = 0;
+                //preIndexStack.Clear();
+                using (Stream stream = await file.OpenStreamForReadAsync())
+                {
+                    using (StreamReader read = new StreamReader(stream))
+                    {
+                        Textbox1.Text = fullS = s = read.ReadToEnd();
+                        UpdateText(OperateType.None);
+                    }
+                }
+            }
+
+        }
+
+        private void Textbox_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            grid.SizeChanged -= Textbox_SizeChanged;
+            UpdatePadding();
+            UpdateText(OperateType.None);
+            grid.SizeChanged += Textbox_SizeChanged;
+        }
+
+        private void UpdatePadding()
+        {
+            if (size.Height > 0)
+            {
+                var height = size.Height * (int)(grid.ActualHeight / size.Height);
+                if (sv.ActualHeight - height > 0) sv.Margin = new Thickness(0, 0, 0, sv.ActualHeight - height);
+                //Textbox1.MaxLines = (int)(grid.ActualHeight / size.Height);
+            }
+        }
+
+        private void UpdateText(OperateType op)
+        {
+            try
+            {
+                index = Helper.GetStringAvailableIndex(new MeasureFontRequest()
+                {
+                    Input = s,
+                    FontFamily = Textbox.FontFamily,
+                    FontSize = Textbox.FontSize,
+                    AvailableSize = new Size(grid.ActualWidth, grid.ActualHeight),
+                    IsNext = op != OperateType.Prep,
+                });
+                if (index > 0)
+                {
+                    switch (op)
+                    {
+                        case OperateType.None:
+                            Textbox.Text = s.Substring(0, index);
+                            break;
+                        case OperateType.Next:
+                            currIndex += index;
+                            Textbox.Text = s.Substring(currIndex, index);
+                            break;
+                        case OperateType.Prep:
+                            currIndex -= index;
+                            Textbox.Text = fullS.Substring(currIndex, index);
+                            break;
+                    }
+                }
+                else
+                {
+                    Textbox.Text = "";
+                }
+            }
+            catch (Exception ex) {
+                Textbox.Text = ex.ToString();
+            }
+        }
     }
 
     public enum MenuType
     {
         //Menu,
         FileList,
-        Setting
+        Setting,
+        OpenFile
+    }
+
+    public enum OperateType
+    {
+        None,
+        Prep,
+        Next,
     }
 }
