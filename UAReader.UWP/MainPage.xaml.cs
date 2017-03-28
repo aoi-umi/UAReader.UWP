@@ -33,8 +33,12 @@ namespace UAReader.UWP
             currentView = SystemNavigationManager.GetForCurrentView();
             deviceFamily = Helper.CurrDeviceFamily;
             NavigationCacheMode = NavigationCacheMode.Enabled;
-            size = Helper.MeasureStringSize(new MeasureFontRequest() { Input = "a", MaxLines = 1, FontSize = Textbox1.FontSize }); ;
+            size = Helper.MeasureStringSize(new MeasureFontRequest() { Input = "a", MaxLines = 1, FontSize = Textbox1.FontSize });            
         }
+
+        
+        
+
         private Size size;
         private DeviceFamily deviceFamily;
         private SystemNavigationManager currentView;
@@ -194,8 +198,7 @@ namespace UAReader.UWP
         private void Next_Click(object sender, RoutedEventArgs e)
         {
             if (index > 0 && fullS != null && currIndex < fullS.Length)
-            {
-                s = fullS.Substring(currIndex);                
+            {           
                 UpdateText(OperateType.Next);
             }
             sv.ChangeView(0, sv.VerticalOffset + sv.ActualHeight, sv.ZoomFactor);
@@ -218,6 +221,7 @@ namespace UAReader.UWP
                     using (StreamReader read = new StreamReader(stream))
                     {
                         Textbox1.Text = fullS = s = read.ReadToEnd();
+                        sv.ChangeView(0, 0, sv.ZoomFactor);
                         UpdateText(OperateType.None);
                     }
                 }
@@ -238,7 +242,8 @@ namespace UAReader.UWP
             if (size.Height > 0)
             {
                 var height = size.Height * (int)(grid.ActualHeight / size.Height);
-                if (sv.ActualHeight - height > 0) sv.Margin = new Thickness(0, 0, 0, sv.ActualHeight - height);
+                if (grid.ActualHeight > height)
+                    sv.Margin = new Thickness(0, 0, 0, grid.ActualHeight - height);
                 //Textbox1.MaxLines = (int)(grid.ActualHeight / size.Height);
             }
         }
@@ -247,6 +252,7 @@ namespace UAReader.UWP
         {
             try
             {
+                s = currIndex <= 0 ? fullS : fullS.Substring(currIndex);
                 index = Helper.GetStringAvailableIndex(new MeasureFontRequest()
                 {
                     Input = s,

@@ -44,8 +44,19 @@
                 </ListView>
             </SplitView.Pane>
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
                 <Frame x:Name="mainFrame" Visibility="Collapsed"/>
-                <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Name="Text" Text="a"/>
+                    <TextBlock Text=" 行高："/>
+                    <TextBlock Text="{Binding ActualHeight,ElementName=Text}"/>
+                    <TextBlock Text=" grid高："/>
+                    <TextBlock Text="{Binding ActualHeight,ElementName=grid}"/>
+                </StackPanel>
+                <Grid Grid.Row="2">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition Height="auto"/>
@@ -58,7 +69,7 @@
                         <TextBlock Name="Textbox" TextWrapping="Wrap"/>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <ScrollViewer Name="sv" HorizontalScrollMode="Disabled" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
+                        <ScrollViewer Name="sv" HorizontalScrollMode="Disabled" VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Hidden">
                             <TextBlock Name="Textbox1" TextWrapping="Wrap"/>
                         </ScrollViewer>
                     </Grid>
